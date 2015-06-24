@@ -7,6 +7,7 @@ Requirements
 1. Python 2.7.3 or greater
 2. EC2 API Tools 1.7.4.0 (ec2-api-tools-1.7.4.0)
    http://aws.amazon.com/developertools/351
+3. Path to EC2 API Tools should be "c:/ec2/ec2-api-tools-1.7.4.0/bin/" or modified on lines 15 & 17 
 
 CLI usage
 ---------
