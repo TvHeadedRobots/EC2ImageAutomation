@@ -110,7 +110,7 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
         #check stdout result to see if an image was created
         if len(retVal) > 0 and retVal[0] == 'IMAGE':
             amiId = retVal[1].replace('\r\n','')
-            amiLog.write('AMI created:' + amiId + '\t' + backupImgNameList[n] + '\t' + curdate + '\r\n')
+            amiLog.write('AMI created: ' + amiId + '\t' + backupImgNameList[n] + '\t' + curdate + '\r\n')
             amiLog.close()
             print('Image ' + amiId + ' created')
             
@@ -129,7 +129,8 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
                 print('No AMI created')
                 print(ec2ImgErrOut)
             else:
-                print('Something happened...')
+                amiLog.write('ERROR! stdout: ' + ec2ImgStdOut.replace('\r\n','\t') + 'errout: ' + ec2ImgStdOut.replace('\r\n', '\t'))
+                print('Something unexpected happened...')
                 print('stdout: ' + ec2ImgStdOut)
                 print('errout: ' + ec2ImgErrOut)
 
@@ -143,11 +144,10 @@ backupImgNames = get_backup_img_name(backupInstances)
 # call function to create images
 ec2ImgRun = create_ec2_img(backupInstances, backupImgNames)
 
-
-
-
-    #time.sleep(10)
-    #ec2StatusCmd = ec2StatusCmd + ' ' + backupInstances[n]
-    #exeEc2StatusCmd = subprocess.Popen(ec2StatusCmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-
+#time.sleep(10)
+#for n in backupInstances:
+#    ec2StatusCmd = ec2StatusCmd + ' ' + backupInstances[n]
+#    exeEc2StatusCmd = subprocess.Popen(ec2StatusCmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+#    for line in exeEc2StatusCmd:       
+    
 
