@@ -164,3 +164,6 @@ pip-log.txt
 
 #netbeans
 nbproject
+
+#project specific
+amiLog.txt
