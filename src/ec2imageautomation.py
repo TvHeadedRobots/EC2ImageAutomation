@@ -1,9 +1,7 @@
-# To do: Create EC2 instance image form instance ID with current date/time ec2-create-image [instanceId] -n [image name] [--no-reboot],
-# add "no-reboot" command switch control
+# To do: 
 # check instance status (ec2-describe-instance-status)
 # if status passed quit else reboot instance
 # email status
-# use ec2-describe-tags to get instance ids to backup using "backup" tag 
 
 __author__="skiptabor"
 __date__ ="$Jun 22, 2015 3:17:48 PM$"
@@ -37,18 +35,12 @@ def get_backup_instance(backupVal):
     # split each tag line at [TAB] and populate list
     for line in ec2Tags1d:
         tag = line.split('\t')
-        #print(tag)
-        #print("tag 2: " + tag[2])
-        #print("tag 3: " + tag[3])
-        #print("tag 4: " + tag[4])
 
         # check each tag list for "backup" tag name / value and populate ec2ImgInstanceId list
         # backupVal is passed in as CLI argument 1
         if (tag[3] == 'backup' and tag[4].replace('\r\n','') == backupVal):
             ec2ImgInstanceId.append(tag[2])
-            #print("tag 2: " + tag[2])
-            #print("tag 3: " + tag[3])
-            #print("tag 4: " + tag[4])
+
     return ec2ImgInstanceId
 
 ### get "Name" tag name / value for each instance ID to create backup image name
