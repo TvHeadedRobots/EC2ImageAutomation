@@ -87,7 +87,7 @@ else:
             print('Preforming backup of ' + backupInstances[n] + ' with reboot')
         else:
             ec2ImgCmd = ec2ImgCmd + ' ' + backupInstances[n] + ' -n "' + backupImgName[n] + '"' + ' --no-reboot'
-            print('Preforming backup of ' + backupInstances[n] + ' with reboot')
+            print('Preforming backup of ' + backupInstances[n] + ' with no reboot')
         
         print('Creating image: ' + backupImgName[n] + '...')
         exeEc2ImgCmd = subprocess.Popen(ec2ImgCmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
