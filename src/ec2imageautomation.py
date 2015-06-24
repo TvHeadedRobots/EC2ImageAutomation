@@ -88,54 +88,54 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
         return 
     else:
         for n in range(len(backupInstanceList)):
+            ec2ImgCmd = 'c:/ec2/ec2-api-tools-1.7.4.0/bin/ec2-create-image.cmd'
             if (len(sys.argv) > '1' and sys.argv[2] == 'reboot'):
                 ec2ImgCmd = ec2ImgCmd + ' ' + backupInstanceList[n] + ' -n "' + backupImgNameList[n] + '"'
                 print('Preforming backup of ' + backupInstanceList[n] + ' with reboot')
             else:
                 ec2ImgCmd = ec2ImgCmd + ' ' + backupInstanceList[n] + ' -n "' + backupImgNameList[n] + '"' + ' --no-reboot'
                 print('Preforming backup of ' + backupInstanceList[n] + ' with no reboot')
-                
+
+            print('Creating AMI image named: ' + backupImgNameList[n] + '...')
+            print(ec2ImgCmd)
             exeEc2ImgCmd = subprocess.Popen(ec2ImgCmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 
-        print('Creating AMI image named: ' + backupImgNameList[n] + '...')
-        
-        retVal = []
-        # get results from command 
-        ec2ImgStdOut = exeEc2ImgCmd.stdout.readline()
-        ec2ImgErrOut = exeEc2ImgCmd.stderr.readline()
-        
-        # parse stdout command result
-        retVal = ec2ImgStdOut.split('\t')
+            retVal = []
+            # get results from command 
+            ec2ImgStdOut = exeEc2ImgCmd.stdout.readline()
+            ec2ImgErrOut = exeEc2ImgCmd.stderr.readline()
+
+            # parse stdout command result
+            retVal = ec2ImgStdOut.split('\t')
+
+            #check stdout result to see if an image was created
+            if len(retVal) > 0 and retVal[0] == 'IMAGE':
+                amiId = retVal[1].replace('\r\n','')
+                amiLog.write('AMI created: ' + amiId + '\t' + backupImgNameList[n] + '\t' + curdate + '\r\n')
+                print('Image ' + amiId + ' created')
+
+            # check to see if there was an error returned
+            if ec2ImgErrOut != '':
+                #print('error: ' + ec2ImgErrOut)
+                errRetVal = []
+                errRetVal = ec2ImgErrOut.split(' ')
+
+                # check to see if image name already exists
+                if errRetVal[0] == 'Client.InvalidAMIName.Duplicate:':
+                    amiLog.write(backupImgNameList[n] + ' already exists\t' + curdate + '\t' + errRetVal[0] + '\r\n')
+                    # add duplicate AMI names to list to rerun
+                    dupeAmiNames.append(backupImgNameList[n])
+                    print('No AMI created')
+                    print(ec2ImgErrOut)
+                else:
+                    amiLog.write('ERROR! stdout: ' + ec2ImgStdOut.replace('\r\n','\t') + 'errout: ' + ec2ImgStdOut.replace('\r\n', '\t'))
+                    print('Something unexpected happened...')
+                    print('stdout: ' + ec2ImgStdOut)
+                    print('errout: ' + ec2ImgErrOut)
+            time.sleep(10)
                 
-        #check stdout result to see if an image was created
-        if len(retVal) > 0 and retVal[0] == 'IMAGE':
-            amiId = retVal[1].replace('\r\n','')
-            amiLog.write('AMI created: ' + amiId + '\t' + backupImgNameList[n] + '\t' + curdate + '\r\n')
-            amiLog.close()
-            print('Image ' + amiId + ' created')
-            
-        # check to see if there was an error returned
-        if ec2ImgErrOut != '':
-            #print('error: ' + ec2ImgErrOut)
-            errRetVal = []
-            errRetVal = ec2ImgErrOut.split(' ')
-
-            # check to see if image name already exists
-            if errRetVal[0] == 'Client.InvalidAMIName.Duplicate:':
-                amiLog.write(backupImgNameList[n] + ' already exists\t' + curdate + '\t' + errRetVal[0] + '\r\n')
-                amiLog.close()
-                # add duplicate AMI names to list to rerun
-                dupeAmiNames.append(backupImgNameList[n])
-                print('No AMI created')
-                print(ec2ImgErrOut)
-            else:
-                amiLog.write('ERROR! stdout: ' + ec2ImgStdOut.replace('\r\n','\t') + 'errout: ' + ec2ImgStdOut.replace('\r\n', '\t'))
-                print('Something unexpected happened...')
-                print('stdout: ' + ec2ImgStdOut)
-                print('errout: ' + ec2ImgErrOut)
-
-
-        return
+    amiLog.close()
+    return
 
 
 # call functions to get backup instances and image names
