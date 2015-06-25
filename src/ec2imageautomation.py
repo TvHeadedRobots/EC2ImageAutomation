@@ -77,6 +77,8 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
     
     ec2ImgCmd = 'c:/ec2/ec2-api-tools-1.7.4.0/bin/ec2-create-image.cmd'
     dupeAmiNames = []
+    #create dict to return command result
+    ec2ImgResult = {}
     
     if len(backupInstanceList) != len(backupImgNameList):
         print(len(backupImgNameList)) 
@@ -85,6 +87,8 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
         print(len(backupImgNameList))
         print('len(backupInstanceList) = ')
         print(len(backupInstanceList))
+        for n in backupInstanceList:
+            ec2ImgResult[backupInstanceList[n]] = "ERROR_LIST_SZ"
         return 
     else:
         for n in range(len(backupInstanceList)):
@@ -97,7 +101,7 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
                 print('Preforming backup of ' + backupInstanceList[n] + ' with no reboot')
 
             print('Creating AMI image named: ' + backupImgNameList[n] + '...')
-            print(ec2ImgCmd)
+            print('Command: ' + ec2ImgCmd)
             exeEc2ImgCmd = subprocess.Popen(ec2ImgCmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 
             retVal = []
@@ -113,7 +117,7 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
                 amiId = retVal[1].replace('\r\n','')
                 amiLog.write('AMI created: ' + amiId + '\t' + backupImgNameList[n] + '\t' + curdate + '\r\n')
                 print('Image ' + amiId + ' created')
-
+                ec2ImgResult[backupInstanceList[n]] = amiId
             # check to see if there was an error returned
             if ec2ImgErrOut != '':
                 #print('error: ' + ec2ImgErrOut)
@@ -127,15 +131,17 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
                     dupeAmiNames.append(backupImgNameList[n])
                     print('No AMI created')
                     print(ec2ImgErrOut)
+                    ec2ImgResult[backupInstanceList[n]] = "ERROR_DUPE"
                 else:
                     amiLog.write('ERROR! stdout: ' + ec2ImgStdOut.replace('\r\n','\t') + 'errout: ' + ec2ImgStdOut.replace('\r\n', '\t'))
                     print('Something unexpected happened...')
                     print('stdout: ' + ec2ImgStdOut)
                     print('errout: ' + ec2ImgErrOut)
+                    ec2ImgResult[backupInstanceList[n]] = ec2ImgErrOut
             time.sleep(10)
                 
     amiLog.close()
-    return
+    return ec2ImgResult
 
 
 # call functions to get backup instances and image names
@@ -143,6 +149,7 @@ backupInstances = get_backup_instance(backupValArg)
 backupImgNames = get_backup_img_name(backupInstances)
 # call function to create images
 ec2ImgRun = create_ec2_img(backupInstances, backupImgNames)
+print(ec2ImgRun)
 
 #time.sleep(10)
 #for n in backupInstances:
