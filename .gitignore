@@ -168,3 +168,4 @@ nbproject
 #project specific
 amiLog.txt
 Backup_Tags_Schedule.txt
+*.bat

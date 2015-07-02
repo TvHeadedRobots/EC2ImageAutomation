@@ -97,10 +97,10 @@ def create_ec2_img(backupInstanceList, backupImgNameList):
             ec2ImgCmd = 'c:/ec2/ec2-api-tools-1.7.4.0/bin/ec2-create-image.cmd'
             if (len(sys.argv) > '1' and sys.argv[2] == 'reboot'):
                 ec2ImgCmd = ec2ImgCmd + ' ' + backupInstanceList[n] + ' -n "' + backupImgNameList[n] + '"'
-                print('Preforming backup of ' + backupInstanceList[n] + ' with reboot')
+                print('\r\nPreforming backup of ' + backupInstanceList[n] + ' with reboot')
             else:
                 ec2ImgCmd = ec2ImgCmd + ' ' + backupInstanceList[n] + ' -n "' + backupImgNameList[n] + '"' + ' --no-reboot'
-                print('Preforming backup of ' + backupInstanceList[n] + ' with no reboot')
+                print('\r\nPreforming backup of ' + backupInstanceList[n] + ' with no reboot')
 
             print('Creating AMI image named: ' + backupImgNameList[n] + '...')
             print('Command: ' + ec2ImgCmd)
